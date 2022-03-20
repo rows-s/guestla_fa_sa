@@ -5,7 +5,6 @@ from fastapi import FastAPI
 from . import db
 from . import fix_issue_837
 
-
 app = FastAPI()
 
 
@@ -15,5 +14,16 @@ async def root():
 
 
 @app.get('/user/{user_id}')
-async def get_user(user_id: str):
+async def read_user(user_id: str):
     return {'user u wanna get': user_id}
+
+
+@app.post('/user')
+async def post_user(user: db.UserCreate):
+    async with create_engine(db.url) as engine:
+        async with engine.acquire() as conn:
+            conn: SAConnection
+            async with conn.begin() as tr:
+                tr: Transaction
+
+    return user.dict()
