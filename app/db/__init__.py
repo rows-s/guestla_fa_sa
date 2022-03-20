@@ -1,7 +1,9 @@
-from asyncio import run
-
-from aiopg.sa import create_engine
-
 from .models import *
 
-engine = run(create_engine('postgres'))
+config = {  # TODO: use environment variables
+    'host': '127.0.0.1',
+    'port': 5432,
+    'database': 'test',
+    'user': 'testuser',
+    'password': 'TESTpassWORD'
+}
