@@ -1,5 +1,3 @@
-from aiopg.sa.connection import SAConnection, Transaction
-from aiopg.sa.engine import create_engine
 from fastapi import FastAPI
 
 from . import db
@@ -20,10 +18,9 @@ async def read_user(user_id: str):
 
 @app.post('/user')
 async def post_user(user: db.UserCreate):
-    async with create_engine(db.url) as engine:
-        async with engine.acquire() as conn:
-            conn: SAConnection
-            async with conn.begin() as tr:
-                tr: Transaction
+    user = db.User(email=user.email, password=user.password)
+    async with db.make_async_session() as session:
+        async with session:
+            session.add_all([user])
 
-    return user.dict()
+    return {'id': user.id}
