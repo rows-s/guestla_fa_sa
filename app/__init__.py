@@ -18,9 +18,8 @@ async def read_user(user_id: str):
 
 @app.post('/user')
 async def post_user(user: db.UserCreate):
-    user = db.User(email=user.email, password=user.password)
-    async with db.make_async_session() as session:
-        async with session:
-            session.add_all([user])
-
+    async with db.make_async_session(expire_on_commit=False) as session:
+        user = db.User(email=user.email, password=user.password)
+        session.add(user)
+    print(f"Added user {user.id}")
     return {'id': user.id}
