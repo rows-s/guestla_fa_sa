@@ -5,16 +5,17 @@ from sqlalchemy.orm import sessionmaker
 
 from .models import *
 
-url = 'postgresql+asyncpg://testuser:TESTpassW0RD@localhost/test'
+url = 'postgresql+asyncpg://testuser:TESTpassW0RD@localhost/test'  # TODO: use env var
+engine = create_async_engine(url)
 
 
 @asynccontextmanager
-async def make_async_session(create_engine_kw=None) -> AsyncSession:
+async def make_async_session(engine_=engine, **kw) -> AsyncSession:
+    session = sessionmaker(engine_, class_=AsyncSession, **kw)()  # called!
     try:
-        engine = create_async_engine(url, **(create_engine_kw or {}))
-        async_session = sessionmaker(engine, class_=AsyncSession)
-        async with async_session() as session:
-            yield session
+        yield session
+        # else block:
+        await session.commit()
     finally:
-        pass
+        await session.close()
 
