@@ -1,14 +1,12 @@
-from pydantic import BaseModel
+import pydantic
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import declarative_base
 
-__all__ = ('User', 'UserCreate')
+from .base import Base
 
-
-Base = declarative_base()
+__all__ = ['User', 'UserCreate']
 
 
-class UserCreate(BaseModel):
+class UserCreate(pydantic.BaseModel):
     email: str
     password: str
 
