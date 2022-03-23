@@ -6,7 +6,7 @@ from .engines import base_engine
 __all__ = ['AsyncSession', 'async_session_maker']
 
 
-async_session_maker = sessionmaker(base_engine, expire_on_commit=False)
+async_session_maker = sessionmaker(base_engine, expire_on_commit=False, class_=sa_AsyncSession)
 
 
 class AsyncSession:
@@ -33,6 +33,9 @@ class AsyncSession:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:
             await self.session.commit()
+        else:
+            await self.session.rollback()
+        # close
         await self.session.close()
 
 
