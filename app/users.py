@@ -12,7 +12,7 @@ tags = [Tags.users]
 
 @router.get('/')
 async def iter_users(user_dal=Depends(get_user_dal)):
-    users_gen = user_dal.objects()
+    users_gen = await user_dal.objects()
     return {'users': await users_gen.all()}
 
 
