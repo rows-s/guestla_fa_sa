@@ -28,9 +28,11 @@ class BaseDAL(ABC):
         stream = await self.session.stream(select(self.model))
         return stream.scalars()
 
-    async def create(self, **kw):
+    async def create(self, *, shld_flush=False, **kw):
         instance = self.model(**kw)
         self.session.add(instance)
+        if shld_flush:
+            await self.flush()
         return instance
 
     async def update(self, instance, **kw):
