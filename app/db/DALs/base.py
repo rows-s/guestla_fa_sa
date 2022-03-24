@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Type, AsyncGenerator
 
-from sqlalchemy import Column, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import Base
+from ..models.base import Base
 
 __all__ = ['BaseDAL']
 
@@ -19,18 +19,17 @@ class BaseDAL(ABC):
     def model(self) -> Type[Base]:
         pass
 
-    @property
-    @abstractmethod
-    def pk(self) -> Column:
-        pass
-
     async def flush(self):
         await self.session.flush()
 
+    async def get(self, pk):
+        print(self.model.pk)
+        result = await self.session.execute(select(self.model).where(self.model.pk == pk))
+        return result.scalar()
+
     async def objects(self) -> AsyncGenerator[Base, None]:
         stream = await self.session.stream(select(self.model))
-        async for instance in stream.scalars():
-            yield instance
+        return stream.scalars()
 
     async def create(self, **kw):
         instance = self.model(**kw)
