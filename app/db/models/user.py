@@ -10,8 +10,8 @@ class User(base.Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String, unique=True)
-    password = Column(String)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
 
 
 class UserCreate(pydantic.BaseModel):
