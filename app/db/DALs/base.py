@@ -19,9 +19,6 @@ class BaseDAL(ABC):
     def model(self) -> Type[Base]:
         pass
 
-    async def flush(self):
-        await self.session.flush()
-
     async def get(self, pk):
         print(self.model.pk)
         result = await self.session.execute(select(self.model).where(self.model.pk == pk))
@@ -45,3 +42,9 @@ class BaseDAL(ABC):
 
     async def delete(self, instance):
         await self.session.delete(instance)
+
+    async def flush(self):
+        await self.session.flush()
+
+    async def commit(self):
+        await self.session.commit()
