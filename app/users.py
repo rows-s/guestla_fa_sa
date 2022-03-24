@@ -1,8 +1,7 @@
-from fastapi import APIRouter
-from fastapi.exceptions import HTTPException
-from sqlalchemy import select
+from fastapi import APIRouter, HTTPException
 
 from . import db
+from .db.utils import user_dal_maker
 from .tags import Tags
 
 __all__ = ['router', 'tags']
@@ -12,28 +11,23 @@ tags = [Tags.users]
 
 
 @router.get('/')
-async def iter_users(limit: int = 100):
-    async with db.AsyncSession() as session:
-        async for user in db.ModelDAL(session, db.User).objects():
-            print(user.asdict())
+async def iter_users():
+    async with user_dal_maker() as user_dal:
+        return {'users': await (await user_dal.objects()).all()}
 
 
 @router.get('/{user_id}')
 async def read_user(user_id: int):
-    async with db.AsyncSession() as session:
-        result = await session.execute(
-            select(db.User).where(db.User.id == user_id)
-        )
-        user = result.scalar()
+    async with user_dal_maker() as user_dal:
+        user = await user_dal.get(user_id)
         if user is None:
-            raise HTTPException(404, f'User with `id={user_id}` not found')
+            raise HTTPException(404, f"user with `id={user_id}` doesn't exist")
         return user.asdict()
 
 
 @router.post('/')
 async def post_user(user: db.UserCreate):
-    async with db.AsyncSession() as session:
-        user = db.User(**user.dict())
-        session.add(user)
+    async with user_dal_maker() as user_dal:
+        user = await user_dal.create(**user.dict())
     print(f"Added user {user.id}")
     return {'id': user.id}
