@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Type, AsyncGenerator
+from typing import Type
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncScalarResult
 
 from ..models.base import Base
 
@@ -24,7 +24,7 @@ class BaseDAL(ABC):
         result = await self.session.execute(select(self.model).where(self.model.pk == pk))
         return result.scalar()
 
-    async def objects(self) -> AsyncGenerator[Base, None]:
+    async def objects(self) -> AsyncScalarResult:
         stream = await self.session.stream(select(self.model))
         return stream.scalars()
 
