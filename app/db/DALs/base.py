@@ -23,7 +23,7 @@ class BaseDAL(ABC):
         pass
 
     @classmethod
-    async def create_dal(cls: Type[_T]) -> AsyncGenerator[_T, None]:
+    async def generate_dal(cls: Type[_T]) -> AsyncGenerator[_T, None]:
         """
         Only once yields DAL matching to `cls`.
         Best case is to use within `FastAPI.Depends`.
