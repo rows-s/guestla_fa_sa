@@ -19,6 +19,7 @@ async def read_users(
     users_gen = await user_dal.objects()
     async for page in users_gen.partitions(page_size):
         return {'data': {'users': page}}
+    return {'data': {'users': []}}
 
 
 @router.get('/{user_id}')
