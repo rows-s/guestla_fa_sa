@@ -1,4 +1,4 @@
-__all__ = ['url']
+__all__ = ['DSN']
 
 
-url = 'postgresql+asyncpg://testuser:TESTpassW0RD@localhost/test'  # TODO: use env var
+DSN = 'postgresql+asyncpg://testuser:TESTpassW0RD@localhost/test'  # TODO: use env var
