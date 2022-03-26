@@ -35,7 +35,7 @@ async def read_user(
 
 @router.post('')
 async def post_user(
-        user: db.UserCreate,
+        user: db.UserIn,
         user_dal: db.UserDAL = Depends(get_user_dal)
 ):
     try:
@@ -43,4 +43,4 @@ async def post_user(
     except IntegrityError:  # TODO: Must check which column is duplicated
         raise HTTPException(409, f'user with `email={user.email}` already exist')
     else:
-        return {'data': {'id': user.id}}
+        return {'data': {'id': user}}
