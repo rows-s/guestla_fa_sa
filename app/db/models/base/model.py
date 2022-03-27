@@ -1,4 +1,4 @@
-from sqlalchemy import inspect
+from sqlalchemy import inspect, Column, Integer
 from sqlalchemy.orm import declarative_base
 
 
@@ -12,6 +12,8 @@ class Base(sa_Base):
     """Abstract base class for models"""
     __abstract__ = True
 
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+
     def asdict(self):
         return {c.key: getattr(self, c.key)
                 for c in inspect(self).mapper.column_attrs}
@@ -20,7 +22,3 @@ class Base(sa_Base):
     @property
     def pk(cls):
         return inspect(cls).primary_key[0]
-
-
-
-
