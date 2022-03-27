@@ -14,7 +14,7 @@ class Base(sa_Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
 
-    def asdict(self):
+    def dict(self):
         return {c.key: getattr(self, c.key)
                 for c in inspect(self).mapper.column_attrs}
 

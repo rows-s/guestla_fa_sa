@@ -1,5 +1,5 @@
-from .DALs import utils as dals_utils
-from .DALs.utils import *  # noqa
+from .dals import utils as dals_utils
+from .dals.utils import *  # noqa
 from .models import utils as models_utils
 from .models.utils import * # noqa
 
