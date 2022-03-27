@@ -54,6 +54,7 @@ class BaseDAL(ABC):
                 raise AttributeError(f'Try to update not existing field `{key}` for type `{type(instance)}`')
             setattr(instance, key, kw[key])
         self.session.add(instance)
+
         if shld_flush:
             await self.flush()
 
