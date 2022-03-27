@@ -27,12 +27,12 @@ async def read_user(
     user = await user_dal.get(user_id)
     if user is None:
         raise HTTPException(404, f"user with `id={user_id}` doesn't exist")
-    return {'data': {'user': user.asdict()}}
+    return {'data': {'user': user}}
 
 
 @router.post('')
 async def post_user(
-        user: db.UserIn,
+        user: db.UserCreate,
         user_dal: db.UserDAL = Depends(db.UserDAL.generate_dal)
 ):
     try:
@@ -43,13 +43,21 @@ async def post_user(
         return {'data': {'user': user}}
 
 
-@router.put('')
+@router.put('/{user_id}')
 async def post_user(
+        user_id: int,
+        user_state: db.UserPatch,
         user_dal: db.UserDAL = Depends(db.UserDAL.generate_dal)
 ):
+    user = await user_dal.get(user_id)
+    user_state = user_state.dict(exclude_unset=True)
+
+    if user is None:
+        raise HTTPException(404, f"user with `id={user_id}` doesn't exist")
+
     try:
-        user = await user_dal.create(**user.dict(), shld_flush=True)
+        await user_dal.update(user, **user_state, shld_flush=True)
     except IntegrityError:  # TODO: Must check which column is duplicated
         raise HTTPException(409, f'user with `email={user.email}` already exist')
-    else:
-        return {'data': {'user': user}}
+
+    return {'data': {'user': user}}
