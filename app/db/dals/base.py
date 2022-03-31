@@ -32,20 +32,20 @@ class BaseDAL(ABC):
         async with dal_maker(cls) as dal:
             yield dal
 
-    async def get(self, pk):
-        print(self.model.pk)
-        result = await self.session.execute(select(self.model).where(self.model.pk == pk))
-        return result.scalar()
-
-    async def objects(self) -> AsyncScalarResult:
-        stream = await self.session.stream(select(self.model))
-        return stream.scalars()
-
-    async def create(self, *, shld_flush=False, **kw):
-        instance = self.model(**kw)
+    async def add_to_session(self, instance, shld_flush=False):
         self.session.add(instance)
         if shld_flush:
             await self.flush()
+
+    async def get(self, pk):
+        return await self.session.get(self.model, pk)
+
+    async def objects(self) -> AsyncScalarResult:
+        return await self.session.stream_scalars(select(self.model))
+
+    async def create(self, *, shld_flush=False, **kw):
+        instance = self.model(**kw)
+        await self.add_to_session(instance, shld_flush=shld_flush)
         return instance
 
     async def update(self, instance, shld_flush=False, **kw):
@@ -53,10 +53,7 @@ class BaseDAL(ABC):
             if not hasattr(instance, key):
                 raise AttributeError(f'Try to update not existing field `{key}` for type `{type(instance)}`')
             setattr(instance, key, kw[key])
-        self.session.add(instance)
-
-        if shld_flush:
-            await self.flush()
+        await self.add_to_session(instance, shld_flush=shld_flush)
 
     async def delete(self, instance):
         await self.session.delete(instance)
